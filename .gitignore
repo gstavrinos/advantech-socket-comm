@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# Make/CMake
+CMakeFiles/*
+*.cmake
+CMakeCache.txt
+Makefile
+
+# Executable
+advantech_socket_comm
+
+# vim
+*.swp
+*.swo
