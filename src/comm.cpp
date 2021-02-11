@@ -1,6 +1,5 @@
 #include <chrono>
 #include <thread>
-#include <stdio.h> 
 #include <string.h> 
 #include <stdlib.h>
 #include <unistd.h> 
@@ -8,53 +7,27 @@
 #include <sys/socket.h> 
 #include <netinet/in.h> 
 
-#include <bdaqctrl.h>
-
-using namespace Automation::BDaq;
-
-bool errorChecking(ErrorCode e) {
-    // Check error codes from advantech devices
-    if(BioFailed(e)) {
-        wchar_t enumString[256];
-        AdxEnumToString(L"ErrorCode", (int32)e, 256, enumString);
-        printf("Some error occurred. And the last error code is 0x%X. [%ls]\n", e, enumString);
-    }
-    return BioFailed(e);
-}
+#include "advantech_comm/advantech_comm.hpp"
 
 int main(int argc, char* argv[]) {
     typedef unsigned char byte;
     struct sockaddr_in address; 
 
-    const wchar_t* profilePath = L"../../profile/DemoDevice.xml";
-    const wchar_t * deviceDescription = L"DemoDevice,BID#0";
     const int PORT = 8666;
 
     int server_fd, new_socket, valread; 
     int addrlen = sizeof(address); 
     char buffer[1024] = {0}; 
-    int output_port = 1;
-    int input_port = 0;
     int opt = 1; 
     std::string response = ""; 
 
     // Advantech (DAQNavi) connection initialisation
-    ErrorCode ret = Success;
+    const wchar_t* profilePath = L"../../profile/DemoDevice.xml";
+    const wchar_t * deviceDescription = L"DemoDevice,BID#0";
+    const int output_port = 1;
+    const int input_port = 0;
 
-    InstantDiCtrl * instantDiCtrl = InstantDiCtrl::Create();
-    InstantDoCtrl * instantDoCtrl = InstantDoCtrl::Create();
-
-    DeviceInformation devInfo(deviceDescription);
-
-    ret = instantDiCtrl->setSelectedDevice(devInfo);
-    errorChecking(ret);
-    ret = instantDoCtrl->setSelectedDevice(devInfo);
-    errorChecking(ret);
-
-    ret = instantDiCtrl->LoadProfile(profilePath);
-    errorChecking(ret);
-    ret = instantDoCtrl->LoadProfile(profilePath);
-    errorChecking(ret);
+    advantech_comm::AdvantechComm adv_comm(deviceDescription, profilePath, input_port, output_port);
 
     byte bufferForReading[64] = {0};//the first element of this array is used for start port
     byte bufferForWriting[64] = {0};//the first element is used for start port
@@ -93,33 +66,23 @@ int main(int argc, char* argv[]) {
         if (strcmp(buffer, "0") == 0) {
             std::cout << "Received 'turn off' command." << std::endl;
             // TODO fill bufferForWriting with the required byte(s)
-            ret = instantDoCtrl->Write(output_port, 1, bufferForWriting);
-            errorChecking(ret);
+            adv_comm.write(bufferForWriting);
+            adv_comm.errorChecking();
         }
         else if (strcmp(buffer, "1") == 0) {
             std::cout << "Received 'turn on' command." << std::endl;
             // TODO fill bufferForWriting with the required byte(s)
-            ret = instantDoCtrl->Write(output_port, 1, bufferForWriting);
-            errorChecking(ret);
+            adv_comm.write(bufferForWriting);
+            adv_comm.errorChecking();
         }
-        // ret = instantDiCtrl->Read(input_port, 1, bufferForReading);
-        // errorChecking(ret);
+        // adv_comm.read(bufferForReading);
+        // adv_comm.errorChecking();
         // TODO fill response with the correct value, based on the info in bufferForReading
         response = "1";
         send(new_socket , response.c_str(), strlen(response.c_str()), 0); 
         printf("Replied with %s\n", response.c_str());
-        // NOTE
-        // Alternative way to read/write single bits to advantech device:
-        // int8 data = 0;
-        // int  bit = 0;
-        // ret = instantDiCtrl->ReadBit(startPort, bit, &data);
-        // errorChecking(ret);
-        // ret = instantDoCtrl->WriteBit(startPort, bit, data);
-        // errorChecking(ret);
     }
-
-    instantDiCtrl->Dispose();
-    instantDoCtrl->Dispose();
 
     return 0;
 }
+
