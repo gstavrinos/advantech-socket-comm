@@ -39,6 +39,16 @@ namespace advantech_comm {
         return ret;
     }
 
+    ErrorCode AdvantechComm::writeBit(int8 bit) {
+        ret = instantDoCtrl->WriteBit(output_port, 0, bit);
+        return ret;
+    }
+    
+    ErrorCode AdvantechComm::readBit(uint8* bit) {
+        ret = instantDiCtrl->ReadBit(input_port, 0, bit);
+        return ret;
+    }
+
     bool AdvantechComm::errorChecking() {
         // Check error codes from advantech devices
         if(BioFailed(ret)) {

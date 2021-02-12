@@ -8,14 +8,6 @@ using namespace Automation::BDaq;
 namespace advantech_comm {
 
 class AdvantechComm {
-        // NOTE
-        // Alternative way to read/write single bits to advantech device:
-        // int8 data = 0;
-        // int  bit = 0;
-        // advantech_comm.ret = advantech_comm.instantDiCtrl->ReadBit(startPort, bit, &data);
-        // advantech_comm.errorChecking();
-        // advantech_comm.ret = advantech_comm.instantDoCtrl->WriteBit(startPort, bit, data);
-        // advantech_comm.errorChecking();
 
     public:
         typedef unsigned char byte;
@@ -27,6 +19,8 @@ class AdvantechComm {
         bool errorChecking();
         ErrorCode write(byte*);
         ErrorCode read(byte*);
+        ErrorCode writeBit(int8);
+        ErrorCode readBit(uint8*);
 
     private:
         ErrorCode ret;
