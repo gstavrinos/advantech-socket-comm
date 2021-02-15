@@ -23,6 +23,8 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
     src/advantech_comm.cpp
 )
 
+set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES PUBLIC_HEADER "include/advantech_comm/advantech_comm.hpp")
+
 install(TARGETS ${LIBRARY_TARGET_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}

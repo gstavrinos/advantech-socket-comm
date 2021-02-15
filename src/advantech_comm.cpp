@@ -35,17 +35,17 @@ namespace advantech_comm {
     }
     
     ErrorCode AdvantechComm::read(byte* buffer) {
-        ret = instantDiCtrl->Read(input_port, 1, buffer);
+        ret = instantDiCtrl->Read(input_port, 1, &*buffer);
         return ret;
     }
 
-    ErrorCode AdvantechComm::writeBit(int8 bit) {
+    ErrorCode AdvantechComm::writeBit(uint8 bit) {
         ret = instantDoCtrl->WriteBit(output_port, 0, bit);
         return ret;
     }
     
-    ErrorCode AdvantechComm::readBit(uint8* bit) {
-        ret = instantDiCtrl->ReadBit(input_port, 0, bit);
+    ErrorCode AdvantechComm::readBit(uint8 bit) {
+        ret = instantDiCtrl->ReadBit(input_port, 0, &bit);
         return ret;
     }
 

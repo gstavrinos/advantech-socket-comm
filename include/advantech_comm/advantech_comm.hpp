@@ -19,8 +19,8 @@ class AdvantechComm {
         bool errorChecking();
         ErrorCode write(byte*);
         ErrorCode read(byte*);
-        ErrorCode writeBit(int8);
-        ErrorCode readBit(uint8*);
+        ErrorCode writeBit(uint8);
+        ErrorCode readBit(uint8);
 
     private:
         ErrorCode ret;
